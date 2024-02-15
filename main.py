@@ -144,7 +144,7 @@ def main():
                 if val:
                     draw_block(screen, x, y, COLORS[val - 1])
         pygame.display.update()
-        clock.tick(3)
+        clock.tick(15)
 
     pygame.quit()
 
@@ -153,7 +153,12 @@ def get_best_pos(board, piece):
     figs = {}
     for position in possible_positions:
         new_pos = return_final_position(deepcopy(board), *position)
-        tax = (calculate_height(new_pos) + (3 * below_zeros(new_pos)))
+        tax =  ((2 * below_zeros(new_pos)) +
+               (count_empty_cells(new_pos)) -
+               (2000 * burn(new_pos)) +
+               (5 * calculate_height(new_pos)) +
+               (10 * count_kotls(new_pos)))
+        print(count_kotls(new_pos))
         try:
             figs[tax].append((position))
         except:
@@ -171,6 +176,7 @@ def al():
 
     clock = pygame.time.Clock()
     game_over = False
+    c = 0
     while not game_over:
         if piece['shape'] != rotate_pos:
             rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
@@ -181,16 +187,17 @@ def al():
                 if is_valid_position(board, piece, adj_x=1):
                     piece['x'] += 1
 
-
-        if is_valid_position(board, piece, adj_y=1):
-            piece['y'] += 1
-        else:
-            merge_piece(board, piece)
-            check_lines(board)
-            piece = new_piece()
-            row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'])
-            if not is_valid_position(board, piece):
-                game_over = True
+        if c == 20:
+            if is_valid_position(board, piece, adj_y=1):
+                piece['y'] += 1
+            else:
+                merge_piece(board, piece)
+                check_lines(board)
+                piece = new_piece()
+                row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'])
+                if not is_valid_position(board, piece):
+                    game_over = True
+            c = 0
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -200,7 +207,8 @@ def al():
                 if val:
                     draw_block(screen, x, y, COLORS[val - 1])
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(1000)
+        c += 1
     pygame.quit()
 
 if __name__ == "__main__":

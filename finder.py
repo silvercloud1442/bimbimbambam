@@ -1,6 +1,5 @@
 from copy import deepcopy
 from pprint import pprint
-import numpy as np
 
 
 # Function to rotate a Tetris figure clockwise
@@ -57,7 +56,7 @@ def return_final_position(glass, row, col, figure):
 def calculate_height(glass):
     c = 0
     for idx, row in enumerate(glass):
-        if 1 in row or 2 in row:
+        if 2 in row:
             c = idx
             break
     return len(glass) - c
@@ -74,6 +73,19 @@ def count_empty_cells(glass):
             empty_count += row.count(0)
     return empty_count
 
+def count_kotls(glass):
+    kotls = 0
+    c = 0
+    for row in glass:
+        s_row = ''.join(map(str, row))
+        if s_row[:2] == '01' or s_row[:2] == '02' or\
+           '202' in s_row or '101' in s_row or\
+            s_row[-2:] == '10' or s_row[-2:] == '20':
+            c += 1
+        if c == 3:
+            kotls += 1
+            c = 0
+    return kotls
 def below_zeros(glass):
     np_glass = list(map(list, zip(*glass)))
     zeros = 0
@@ -87,6 +99,15 @@ def below_zeros(glass):
                 if closed and i == '0':
                     zeros += 1
     return zeros
+
+def burn(glass):
+    c = 0
+    for row in glass:
+        if 0 not in row:
+            c += 1
+    return c
+
+
 # Example usage
 if __name__ == "__main__":
 

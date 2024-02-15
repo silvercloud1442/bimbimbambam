@@ -1,5 +1,6 @@
 import pygame
 import random
+from finder import *
 from pprint import pprint
 
 # Constants
@@ -16,25 +17,25 @@ SHAPES = [
     [[1, 1, 1],
      [0, 1, 0]],
 
-    [[0, 2, 2],
-     [2, 2, 0]],
+    [[0, 1, 1],
+     [1, 1, 0]],
 
-    [[3, 3],
-     [3, 3]],
+    [[1, 1],
+     [1, 1]],
 
-    [[5, 5, 0],
-     [0, 5, 5]],
+    [[1, 1, 0],
+     [0, 1, 1]],
 
-    [[0, 6, 0, 0],
-     [0, 6, 0, 0],
-     [0, 6, 0, 0],
-     [0, 6, 0, 0]],
+    [[0, 1, 0, 0],
+     [0, 1, 0, 0],
+     [0, 1, 0, 0],
+     [0, 1, 0, 0]],
 
-    [[7, 0, 0],
-     [7, 7, 7]],
+    [[1, 0, 0],
+     [1, 1, 1]],
 
-    [[7, 7, 7],
-     [7, 0, 0]]
+    [[1, 1, 1],
+     [1, 0, 0]]
 ]
 
 # Initialize pygame
@@ -57,7 +58,7 @@ def new_piece():
     piece = {
         'shape': shape,
         'color': random.choice(COLORS),
-        'x': GRID_WIDTH // 2 - len(shape[0]) // 2,
+        'x': 0,
         'y': 0
     }
     return piece
@@ -80,9 +81,7 @@ def is_valid_position(board, piece, adj_x=0, adj_y=0):
         for j in range(len(shape[i])):
             if shape[i][j]:
                 if x + j < 0 or x + j >= GRID_WIDTH or y + i >= GRID_HEIGHT or board[y + i][x + j]:
-
                     return False
-
     return True
 
 def merge_piece(board, piece):
@@ -93,7 +92,6 @@ def merge_piece(board, piece):
         for j in range(len(shape[i])):
             if shape[i][j]:
                 board[y + i][x + j] = 1
-    pprint(board)
 
 def check_lines(board):
     lines_to_clear = []
@@ -150,5 +148,60 @@ def main():
 
     pygame.quit()
 
+def get_best_pos(board, piece):
+    possible_positions = generate_possible_positions(board, piece)
+    figs = {}
+    for position in possible_positions:
+        new_pos = return_final_position(deepcopy(board), *position)
+        tax = (3 * calculate_height(new_pos)) + (4 * count_empty_cells(new_pos))
+        try:
+            figs[tax].append((position))
+        except:
+            figs[tax] = []
+            figs[tax].append((position))
+    best_score = sorted(figs.keys())[0]
+    pos = figs[best_score][0]
+    return pos
+
+
+def al():
+    board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
+    piece = new_piece()
+    row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'])
+
+    clock = pygame.time.Clock()
+    game_over = False
+    while not game_over:
+        if piece['shape'] != rotate_pos:
+            rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
+            if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
+                piece['shape'] = rotated_shape
+        else:
+            if piece['x'] < col_num:
+                if is_valid_position(board, piece, adj_x=1):
+                    piece['x'] += 1
+
+
+        if is_valid_position(board, piece, adj_y=1):
+            piece['y'] += 1
+        else:
+            merge_piece(board, piece)
+            check_lines(board)
+            piece = new_piece()
+            row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'])
+            if not is_valid_position(board, piece):
+                game_over = True
+
+        screen.fill(BLACK)
+        draw_grid(screen)
+        draw_piece(screen, piece)
+        for y, row in enumerate(board):
+            for x, val in enumerate(row):
+                if val:
+                    draw_block(screen, x, y, COLORS[val - 1])
+        pygame.display.update()
+        clock.tick(20)
+    pygame.quit()
+
 if __name__ == "__main__":
-    main()
+    al()

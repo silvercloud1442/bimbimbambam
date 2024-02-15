@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pprint import pprint
+import numpy as np
 
 
 # Function to rotate a Tetris figure clockwise
@@ -73,49 +74,36 @@ def count_empty_cells(glass):
             empty_count += row.count(0)
     return empty_count
 
+def below_zeros(glass):
+    glass
 
 # Example usage
+if __name__ == "__main__":
 
-glass = \
-    [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-     [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-     [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-     [0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 1, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1],
-     [1, 1, 1, 1, 1, 0, 0, 1, 1, 1]]
+    glass = [[0] * 10 for _ in range(20)]
 
-tetris_figures = [[[1, 0, 0],
-                  [1, 1, 1,]]]
-# Iterate over all Tetris figures
-figs = {}
-for figure in tetris_figures:
-    possible_positions = generate_possible_positions(glass, figure)
-    print("Possible positions for figure:")
-    for position in possible_positions:
-        # print(position)
-        new_pos = return_final_position(deepcopy(glass), *position)
-        # pprint(new_pos)
-        tax = calculate_height(new_pos) + count_empty_cells(new_pos)
-        # print(tax)
-        try:
-            figs[tax].append((position, new_pos))
-        except:
-            figs[tax] = []
-            figs[tax].append((position, new_pos))
-best_score = sorted(figs.keys())[0]
-pos = figs[best_score][0][1]
-pprint(pos)
+    tetris_figures = [[[1],
+                      [1],
+                      [1],
+                      [1]]]
+    # Iterate over all Tetris figures
+    figs = {}
+    for figure in tetris_figures:
+        possible_positions = generate_possible_positions(glass, figure)
+        print("Possible positions for figure:")
+        for position in possible_positions:
+            # print(position)
+            new_pos = return_final_position(deepcopy(glass), *position)
+            # pprint(new_pos)
+            tax = calculate_height(new_pos) + count_empty_cells(new_pos)
+            pprint(new_pos)
+            print(tax)
+    #         try:
+    #             figs[tax].append((position, new_pos))
+    #         except:
+    #             figs[tax] = []
+    #             figs[tax].append((position, new_pos))
+    # best_score = sorted(figs.keys())[0]
+    # pos = figs[best_score][0][1]
+    # pprint(pos)
+    # print(figs[best_score][0][0])

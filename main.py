@@ -153,7 +153,7 @@ def get_best_pos(board, piece):
     figs = {}
     for position in possible_positions:
         new_pos = return_final_position(deepcopy(board), *position)
-        tax = (3 * calculate_height(new_pos)) + (4 * count_empty_cells(new_pos))
+        tax = (calculate_height(new_pos) + (3 * below_zeros(new_pos)))
         try:
             figs[tax].append((position))
         except:
@@ -200,7 +200,7 @@ def al():
                 if val:
                     draw_block(screen, x, y, COLORS[val - 1])
         pygame.display.update()
-        clock.tick(20)
+        clock.tick(10)
     pygame.quit()
 
 if __name__ == "__main__":

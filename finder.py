@@ -75,8 +75,18 @@ def count_empty_cells(glass):
     return empty_count
 
 def below_zeros(glass):
-    glass
-
+    np_glass = list(map(list, zip(*glass)))
+    zeros = 0
+    for row in np_glass:
+        if 1 in row or 2 in row:
+            new_row = map(str, row)
+            closed = False
+            for i in new_row:
+                if i == '1' or i == '2':
+                    closed = True
+                if closed and i == '0':
+                    zeros += 1
+    return zeros
 # Example usage
 if __name__ == "__main__":
 

@@ -86,8 +86,9 @@ def count_kotls(glass):
             kotls += 1
             c = 0
     return kotls
+
 def below_zeros(glass):
-    np_glass = list(map(list, zip(*glass)))
+    np_glass = [i for i in list(map(list, zip(*glass))) if 0 in i]
     zeros = 0
     for row in np_glass:
         if 1 in row or 2 in row:
@@ -107,6 +108,14 @@ def burn(glass):
             c += 1
     return c
 
+def place_height(glass):
+    f = False
+    for idx, row in enumerate(glass):
+        if 2 in row:
+            f = True
+        elif not f:
+            return len(glass) - (idx + 1)
+    return 0
 
 # Example usage
 if __name__ == "__main__":

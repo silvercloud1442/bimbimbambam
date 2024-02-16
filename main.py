@@ -26,10 +26,10 @@ SHAPES = [
     [[1, 1, 0],
      [0, 1, 1]],
 
-    [[0, 1, 0, 0],
-     [0, 1, 0, 0],
-     [0, 1, 0, 0],
-     [0, 1, 0, 0]],
+    [[1],
+     [1],
+     [1],
+     [1]],
 
     [[1, 0, 0],
      [1, 1, 1]],
@@ -105,63 +105,70 @@ def check_lines(board):
         board.insert(0, [0] * GRID_WIDTH)
     return score
 
-# def main():
-#     board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
-#     piece = new_piece()
-#     clock = pygame.time.Clock()
-#     game_over = False
-#     while not game_over:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 game_over = True
-#             if event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_LEFT:
-#                     if is_valid_position(board, piece, adj_x=-1):
-#                         piece['x'] -= 1
-#                 elif event.key == pygame.K_RIGHT:
-#                     if is_valid_position(board, piece, adj_x=1):
-#                         piece['x'] += 1
-#                 elif event.key == pygame.K_DOWN:
-#                     if is_valid_position(board, piece, adj_y=1):
-#                         piece['y'] += 1
-#                 elif event.key == pygame.K_UP:
-#                     # Rotate piece
-#                     rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
-#                     if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
-#                         piece['shape'] = rotated_shape
-#
-#         if is_valid_position(board, piece, adj_y=1):
-#             piece['y'] += 1
-#         else:
-#             merge_piece(board, piece)
-#             check_lines(board)
-#             piece = new_piece()
-#             if not is_valid_position(board, piece):
-#                 game_over = True
-#
-#         screen.fill(BLACK)
-#         draw_grid(screen)
-#         draw_piece(screen, piece)
-#         for y, row in enumerate(board):
-#             for x, val in enumerate(row):
-#                 if val:
-#                     draw_block(screen, x, y, COLORS[val - 1])
-#         pygame.display.update()
-#         clock.tick(15)
-#
-#     pygame.quit()
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Tetris")
+
+    board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
+    piece = new_piece()
+    clock = pygame.time.Clock()
+    game_over = False
+    while not game_over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    if is_valid_position(board, piece, adj_x=-1):
+                        piece['x'] -= 1
+                elif event.key == pygame.K_RIGHT:
+                    if is_valid_position(board, piece, adj_x=1):
+                        piece['x'] += 1
+                elif event.key == pygame.K_DOWN:
+                    if is_valid_position(board, piece, adj_y=1):
+                        piece['y'] += 1
+                elif event.key == pygame.K_UP:
+                    # Rotate piece
+                    rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
+                    if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
+                        piece['shape'] = rotated_shape
+
+        if is_valid_position(board, piece, adj_y=1):
+            piece['y'] += 1
+        else:
+            merge_piece(board, piece)
+            check_lines(board)
+            piece = new_piece()
+            if not is_valid_position(board, piece):
+                game_over = True
+
+        screen.fill(BLACK)
+        draw_grid(screen)
+        draw_piece(screen, piece)
+        for y, row in enumerate(board):
+            for x, val in enumerate(row):
+                if val:
+                    draw_block(screen, x, y, COLORS[val - 1])
+        pygame.display.update()
+        clock.tick(15)
+
+    pygame.quit()
 
 def get_best_pos(board, piece, n):
     possible_positions = generate_possible_positions(board, piece)
-    bz, em_c, brn, hg, ktl = n
+    bz, em_c, brn, hg, ktl, phg = n
     figs = {}
     for position in possible_positions:
         new_pos = return_final_position(deepcopy(board), *position)
-        tax =  ((bz * below_zeros(new_pos)) +
+        tax =  (
+               (bz * below_zeros(new_pos)) +
                (em_c * count_empty_cells(new_pos)) -
                (brn * burn(new_pos)) +
                (hg * calculate_height(new_pos)) +
-               (ktl * count_kotls(new_pos)))
+               (ktl * count_kotls(new_pos)) +
+               (phg * place_height(new_pos))
+                )
         try:
             figs[tax].append((position))
         except:
@@ -215,15 +222,15 @@ def al(n):
                 if val:
                     draw_block(screen, x, y, COLORS[val - 1])
         pygame.display.update()
-        clock.tick(100000)
+        clock.tick(1000)
         c += 1
     pygame.quit()
     return score
 
 
-def generate_individual():
+def generate_individual(n=[random.uniform(0, 10) for _ in range(5)]):
     # Генерация случайной комбинации входных данных
-    return [random.uniform(0, 10) for _ in range(5)]
+    return n
 
 
 def crossover(parent1, parent2):
@@ -241,35 +248,39 @@ def mutate(individual, mutation_rate=0.1):
     return individual
 
 
-population_size = 100
-num_generations = 100
+def _evo_():
+    population_size = 10
+    num_generations = 100
 
-# Инициализация начальной популяции
-population = [generate_individual() for _ in range(population_size)]
+    # Инициализация начальной популяции
+    population = [generate_individual([2.21, 4, 4.7, 9.13, 6.44, 3]) for _ in range(population_size)]
 
-for generation in range(num_generations):
-    # Оценка пригодности популяции
-    fitness_scores = [al(individual) for individual in population]
+    for generation in range(num_generations):
+        # Оценка пригодности популяции
+        fitness_scores = [al(individual) for individual in population]
 
-    # Выбор родителей для скрещивания
-    parents = random.choices(population, weights=fitness_scores, k=population_size)
+        # Выбор родителей для скрещивания
+        parents = random.choices(population, weights=fitness_scores, k=population_size)
 
-    # Создание нового поколения
-    next_generation = []
-    for _ in range(population_size // 2):
-        parent1, parent2 = random.sample(parents, 2)
-        child1 = crossover(parent1, parent2)
-        child2 = crossover(parent2, parent1)
-        next_generation.extend([mutate(child1), mutate(child2)])
+        # Создание нового поколения
+        next_generation = []
+        for _ in range(population_size // 2):
+            parent1, parent2 = random.sample(parents, 2)
+            child1 = crossover(parent1, parent2)
+            child2 = crossover(parent2, parent1)
+            next_generation.extend([mutate(child1), mutate(child2)])
 
-    # Замена текущей популяции на новое поколение
-    population = next_generation
-    print(generation, population[0])
+        # Замена текущей популяции на новое поколение
+        population = next_generation
+        print(generation, population[0])
 
+    # Находим лучший индивид в конечной популяции
+    best_individual = max(population, key=al)
+    best_score = al(best_individual)
+    [8.086109650556615, 1.4011185321924224, 8.787523056243622, 1.6451242696550206, 4.961335274398152, 2.5003765546244026]
+    print("Best individual:", best_individual)
+    print("Best score:", best_score)
 
-# Находим лучший индивид в конечной популяции
-best_individual = max(population, key=al)
-best_score = al(best_individual)
-[0.8853943215436033, 9.926048484508296, 1.0679819103857946, 0.011160205442526383, 6.16830038095594]
-print("Best individual:", best_individual)
-print("Best score:", best_score)
+if __name__ == '__main__':
+    n = [2.21, 4, 4.7, 9.13, 6.44, 3]
+    _evo_()

@@ -53,15 +53,15 @@ def draw_grid(surface):
 def draw_block(surface, x, y, color):
     pygame.draw.rect(surface, color, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
-def new_piece():
-    shape = random.choice(SHAPES)
+def new_piece(pieces):
+    shape = pieces.pop()
     piece = {
         'shape': shape,
         'color': random.choice(COLORS),
         'x': 0,
         'y': 0
     }
-    return piece
+    return (piece, pieces)
 
 def draw_piece(surface, piece):
     shape = piece['shape']
@@ -101,7 +101,7 @@ def check_lines(board):
             lines_to_clear.append(i)
     for line in lines_to_clear:
         del board[line]
-        score += 100
+        score += 1
         board.insert(0, [0] * GRID_WIDTH)
     return score
 
@@ -179,14 +179,15 @@ def get_best_pos(board, piece, n):
     return pos
 
 
-def al(n):
+def al(n, pieces_in):
+    pieces = deepcopy(pieces_in)
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Tetris")
     score = 0
 
     board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
-    piece = new_piece()
+    piece, pieces = new_piece(pieces)
     row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
 
     clock = pygame.time.Clock()
@@ -202,17 +203,17 @@ def al(n):
                 if is_valid_position(board, piece, adj_x=1):
                     piece['x'] += 1
 
-        if c == 2:
+        if c >= 1:
             if is_valid_position(board, piece, adj_y=1):
                 piece['y'] += 1
             else:
                 merge_piece(board, piece)
                 score += check_lines(board)
-                piece = new_piece()
+                piece, pieces = new_piece(pieces)
                 row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
                 if not is_valid_position(board, piece):
                     game_over = True
-            c = 0
+            c = -1
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -222,8 +223,8 @@ def al(n):
                 if val:
                     draw_block(screen, x, y, COLORS[val - 1])
         pygame.display.update()
-        clock.tick(1000)
-        c += 1
+        clock.tick(100000)
+        c += 0.67
     pygame.quit()
     return score
 
@@ -244,43 +245,54 @@ def mutate(individual, mutation_rate=0.1):
     # Мутация с некоторой вероятностью
     for i in range(len(individual)):
         if random.random() < mutation_rate:
-            individual[i] = random.uniform(0, 10)
+            individual[i] += random.uniform(-3, 3)
     return individual
 
 
-def _evo_():
-    population_size = 10
-    num_generations = 100
+def _evo_(pieces_in):
+    population_size = 50
+    num_generations = 50
 
     # Инициализация начальной популяции
-    population = [generate_individual([2.21, 4, 4.7, 9.13, 6.44, 3]) for _ in range(population_size)]
+    population = [generate_individual([9.017730333735216,
+                                       -0.5029751608793931,
+                                       8.185255934016954, 
+                                       5.282825368844182,
+                                       2.3900665026898897,
+                                       0.05709931667641932])
+                  for _ in range(population_size)]
 
     for generation in range(num_generations):
         # Оценка пригодности популяции
-        fitness_scores = [al(individual) for individual in population]
+        fitness_scores = [(individual, al(individual, pieces_in)) for individual in population]
 
         # Выбор родителей для скрещивания
-        parents = random.choices(population, weights=fitness_scores, k=population_size)
+        # parents = random.choices(population, weights=fitness_scores, k=population_size)
+
+        parents = sorted(fitness_scores, key=lambda x: x[1], reverse=True)[:2]
 
         # Создание нового поколения
         next_generation = []
+        print(fitness_scores)
+        print(generation, parents[0], al(parents[0][0], pieces_in))
         for _ in range(population_size // 2):
             parent1, parent2 = random.sample(parents, 2)
-            child1 = crossover(parent1, parent2)
-            child2 = crossover(parent2, parent1)
+            child1 = crossover(parent1[0], parent2[0])
+            child2 = crossover(parent2[0], parent1[0])
             next_generation.extend([mutate(child1), mutate(child2)])
 
         # Замена текущей популяции на новое поколение
         population = next_generation
-        print(generation, population[0])
+
 
     # Находим лучший индивид в конечной популяции
     best_individual = max(population, key=al)
-    best_score = al(best_individual)
+    best_score = al(best_individual, pieces_in)
     [8.086109650556615, 1.4011185321924224, 8.787523056243622, 1.6451242696550206, 4.961335274398152, 2.5003765546244026]
     print("Best individual:", best_individual)
     print("Best score:", best_score)
 
 if __name__ == '__main__':
     n = [2.21, 4, 4.7, 9.13, 6.44, 3]
-    _evo_()
+    pieces_in = [random.choice(SHAPES) for _ in range(1000)]
+    _evo_(pieces_in)

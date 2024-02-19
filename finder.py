@@ -75,16 +75,32 @@ def count_empty_cells(glass):
 
 def count_kotls(glass):
     kotls = 0
-    c = 0
+    l_c = 0
+    m_c = 0
+    r_c = 0
     for row in glass:
         s_row = ''.join(map(str, row))
-        if s_row[:2] == '01' or s_row[:2] == '02' or\
-           '202' in s_row or '101' in s_row or\
-            s_row[-2:] == '10' or s_row[-2:] == '20':
-            c += 1
-        if c == 3:
-            kotls += 1
-            c = 0
+        if s_row[:2] == '01' or s_row[:2] == '02':
+            l_c += 1
+            if l_c == 3:
+                l_c = 0
+                kotls += 1
+        else:
+            l_c = 0
+        if '101' in s_row or '202' in s_row:
+            m_c += 1
+            if m_c == 3:
+                m_c = 0
+                kotls += 1
+        else:
+            m_c = 0
+        if s_row[:2] == '10' or s_row[:2] == '20':
+            r_c += 1
+            if r_c == 3:
+                r_c = 0
+                kotls += 1
+        else:
+            r_c = 0
     return kotls
 
 def below_zeros(glass):

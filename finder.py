@@ -32,7 +32,13 @@ def is_valid_position(glass, figure, row, col):
 # Function to generate all possible positions for placing a Tetris figure
 def generate_possible_positions(glass, figure):
     possible_positions = []
-    for row in range(len(glass)):
+    c = len(glass) - 4
+    for idx, row in enumerate(glass):
+        if 1 in row:
+            c = idx - 4
+            break
+    c = c if c >= 0 else 0
+    for row in range(c, len(glass)):
         for col in range(len(glass[0])):
             for rotation in range(4):
                 rotated_figure = figure

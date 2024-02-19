@@ -103,7 +103,7 @@ def check_lines(board):
         del board[line]
         score += 1
         board.insert(0, [0] * GRID_WIDTH)
-    return 1 * (2 ** score)
+    return 2 ** score
 
 def main():
     pygame.init()
@@ -271,11 +271,11 @@ def _evo_(pieces_in):
 
     # Инициализация начальной популяции
     population = [generate_individual([9.228456141792355,
-                                       -0.5029751608793931,
-                                       5.395497632135037,
-                                       7.340911149608494,
-                                       1.2882418773397828,
-                                       0.05709931667641932])
+                                       -0.2660360825846304,
+                                       4.427810277532197,
+                                       7.349386537760635,
+                                       4.056100876747962,
+                                       3.571063702812714])
                   for _ in range(population_size)]
 
     fitness_scores = [(individual, 0) for individual in population]

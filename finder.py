@@ -74,34 +74,43 @@ def count_empty_cells(glass):
     return empty_count
 
 def count_kotls(glass):
-    kotls = 0
-    l_c = 0
-    m_c = 0
-    r_c = 0
-    for row in glass:
-        s_row = ''.join(map(str, row))
-        if s_row[:2] == '01' or s_row[:2] == '02':
-            l_c += 1
-            if l_c == 3:
-                l_c = 0
-                kotls += 1
-        else:
-            l_c = 0
-        if '101' in s_row or '202' in s_row:
-            m_c += 1
-            if m_c == 3:
-                m_c = 0
-                kotls += 1
-        else:
-            m_c = 0
-        if s_row[:2] == '10' or s_row[:2] == '20':
-            r_c += 1
-            if r_c == 3:
-                r_c = 0
-                kotls += 1
-        else:
-            r_c = 0
-    return kotls
+    # kotls = 0
+    # l_c = 0
+    # m_c = 0
+    # r_c = 0
+    # for row in glass:
+    #     s_row = ''.join(map(str, row))
+    #     if s_row[:2] == '01' or s_row[:2] == '02':
+    #         l_c += 1
+    #         if l_c == 3:
+    #             l_c = 0
+    #             kotls += 1
+    #     else:
+    #         l_c = 0
+    #     if '101' in s_row or '202' in s_row:
+    #         m_c += 1
+    #         if m_c == 3:
+    #             m_c = 0
+    #             kotls += 1
+    #     else:
+    #         m_c = 0
+    #     if s_row[:2] == '10' or s_row[:2] == '20':
+    #         r_c += 1
+    #         if r_c == 3:
+    #             r_c = 0
+    #             kotls += 1
+    #     else:
+    #         r_c = 0
+    # return kotls
+    count = 0
+    for col in range(len(glass[0])):
+        for row in range(len(glass) - 3):  # Ensure at least 4 rows left
+            if all(glass[row + i][col] == 0 for i in range(4)):
+                # Check if the column is surrounded by '1' or the edge
+                if (col == 0 or all(glass[row + i][col - 1] == 1 for i in range(4))) and \
+                        (col == len(glass[0]) - 1 or all(glass[row + i][col + 1] == 1 for i in range(4))):
+                    count += 1
+    return count
 
 def below_zeros(glass):
     np_glass = [i for i in list(map(list, zip(*glass))) if 0 in i]

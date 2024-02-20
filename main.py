@@ -37,6 +37,9 @@ SHAPES = [
     [[1, 1, 1],
      [1, 0, 0]]
 ]
+pieces_in = []
+[pieces_in.extend(SHAPES) for _ in range(5)]
+pieces = deepcopy(pieces_in)
 #
 # # Initialize pygame
 # pygame.init()
@@ -53,7 +56,10 @@ def draw_grid(surface):
 def draw_block(surface, x, y, color):
     pygame.draw.rect(surface, color, (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
-def new_piece(pieces):
+def new_piece():
+    global pieces
+    if len(pieces) == 0:
+        pieces = deepcopy(pieces_in)
     shape = pieces.pop()
     piece = {
         'shape': shape,
@@ -182,9 +188,8 @@ def get_best_pos(board, piece, n):
         return (0, 0, piece)
 
 
-def al(n, pieces_in, idx):
+def al(n, idx):
     print(f'    {idx} : {n}')
-    pieces = deepcopy(pieces_in)
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Tetris")
@@ -195,7 +200,7 @@ def al(n, pieces_in, idx):
     score_surface = font.render('0', True, (255, 255, 255))
 
     board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
-    piece, pieces = new_piece(pieces)
+    piece, pieces = new_piece()
     row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
 
     # clock = pygame.time.Clock()
@@ -221,7 +226,7 @@ def al(n, pieces_in, idx):
         merge_piece(board, piece)
         score += check_lines(board)
         score_surface = font.render(str(score), True, (255, 255, 255))
-        piece, pieces = new_piece(pieces)
+        piece, pieces = new_piece()
         row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
         if not is_valid_position(board, piece):
             game_over = True
@@ -260,12 +265,12 @@ def mutate(individual, parents, mutation_rate=0.1):
         if parents[0][i] == parents[1][i]:
             cross += 1
     for i in range(len(individual)):
-        if random.random() < mutation_rate + (cross * 0.02):
+        if random.random() < mutation_rate + (cross * 0.03):
             individual[i] += random.uniform(-3, 3)
     return individual
 
 
-def _evo_(pieces_in):
+def _evo_():
     population_size = 50
     num_generations = 50
 
@@ -293,15 +298,14 @@ def _evo_(pieces_in):
 
         # Замена текущей популяции на новое поколение
         population = next_generation
-        fitness_scores = [(individual, al(individual, pieces_in, idx)) for idx, individual in enumerate(population)]
+        fitness_scores = [(individual, al(individual, idx)) for idx, individual in enumerate(population)]
 
     # Находим лучший индивид в конечной популяции
     best_individual = max(population, key=al)
-    best_score = al(best_individual, pieces_in)
+    best_score = al(best_individual,0)
     print("Best individual:", best_individual)
     print("Best score:", best_score)
 
 if __name__ == '__main__':
     n = [2.21, 4, 4.7, 9.13, 6.44, 3]
-    pieces_in = [random.choice(SHAPES) for _ in range(10000)]
-    _evo_(pieces_in)
+    _evo_()

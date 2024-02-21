@@ -197,10 +197,10 @@ def al(n, idx):
     font = pygame.font.Font(None, 36)
     text = str(idx)
     gen_surface = font.render(text, True, (255, 255, 255))
-    score_surface = font.render('0', True, (255, 255, 255))
 
     board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
     piece, pieces = new_piece()
+    n_pieces = 0
     row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
 
     # clock = pygame.time.Clock()
@@ -227,9 +227,13 @@ def al(n, idx):
         score += check_lines(board)
         score_surface = font.render(str(score), True, (255, 255, 255))
         piece, pieces = new_piece()
+        n_pieces += 1
         row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
         if not is_valid_position(board, piece):
             game_over = True
+        if score >= 20000:
+            game_over = True
+            score += abs(45000 - n_pieces)
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -258,24 +262,24 @@ def crossover(parent1, parent2):
     return child
 
 
-def mutate(individual, parents, mutation_rate=0.1):
+def mutate(individual, parents, mutation_rate=0.3):
     # Мутация с некоторой вероятностью
     cross = 0
     for i in range(len(parents[0])):
         if parents[0][i] == parents[1][i]:
             cross += 1
     for i in range(len(individual)):
-        if random.random() < mutation_rate + (cross * 0.03):
+        if random.random() < mutation_rate + (cross * 0.05):
             individual[i] += random.uniform(-3, 3)
     return individual
 
 
 def _evo_():
-    population_size = 50
+    population_size = 20
     num_generations = 50
 
     # Инициализация начальной популяции
-    population = [generate_individual([9.228456141792355, -0.2660360825846304, 1.871245564656416, 6.2707419377539555, 4.056100876747962, 3.571063702812714])
+    population = [generate_individual([9.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 4.056100876747962, 3.571063702812714])
                   for _ in range(population_size)]
 
     fitness_scores = [(individual, 0) for individual in population]
@@ -303,5 +307,5 @@ def _evo_():
 
 if __name__ == '__main__':
     n = [9.228456141792355, -0.2660360825846304, 1.871245564656416, 6.2707419377539555, 4.056100876747962, 3.571063702812714]
-    al(n, 0)
-    # _evo_()
+    # al(n, 0)
+    _evo_()

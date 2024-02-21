@@ -202,38 +202,38 @@ def al(n, idx):
     piece, pieces = new_piece()
     n_pieces = 0
     row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
-
-    # clock = pygame.time.Clock()
+    score_surface = font.render(str(0), True, (255, 255, 255))
+    clock = pygame.time.Clock()
     game_over = False
     c = 0
     while not game_over:
-        # f = True
-        # if f:
-            # if piece['shape'] != rotate_pos:
-            #     rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
-            #     if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
-            #         piece['shape'] = rotated_shape
-            # else:
-            #     piece['x'] = col_num
-            #     f = False
-        piece['shape'] = rotate_pos
-        piece['x'] = col_num
-        piece['y'] = row_num
+        f = True
+        if f:
+            if piece['shape'] != rotate_pos:
+                rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
+                if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
+                    piece['shape'] = rotated_shape
+            else:
+                piece['x'] = col_num
+                f = False
+        # piece['shape'] = rotate_pos
+        # piece['x'] = col_num
 
-        # if is_valid_position(board, piece, adj_y=1):
 
-    # else:
-        merge_piece(board, piece)
-        score += check_lines(board)
-        score_surface = font.render(str(score), True, (255, 255, 255))
-        piece, pieces = new_piece()
-        n_pieces += 1
-        row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
-        if not is_valid_position(board, piece):
-            game_over = True
-        if score >= 20000:
-            game_over = True
-            score += abs(45000 - n_pieces)
+        if is_valid_position(board, piece, adj_y=1):
+            piece['y'] += 1
+        else:
+            merge_piece(board, piece)
+            score += check_lines(board)
+            score_surface = font.render(str(score), True, (255, 255, 255))
+            piece, pieces = new_piece()
+            n_pieces += 1
+            row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
+            if not is_valid_position(board, piece):
+                game_over = True
+            if score >= 20000:
+                game_over = True
+                score += abs(45000 - n_pieces)
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -245,7 +245,7 @@ def al(n, idx):
         screen.blit(gen_surface, (0, 0))
         screen.blit(score_surface, (200, 0))
         pygame.display.update()
-        # clock.tick(100000)
+        clock.tick(100000000)
     pygame.quit()
     return score
 
@@ -279,7 +279,7 @@ def _evo_():
     num_generations = 50
 
     # Инициализация начальной популяции
-    population = [generate_individual([9.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 4.056100876747962, 3.571063702812714])
+    population = [generate_individual([22.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 10.056100876747962, 3.571063702812714])
                   for _ in range(population_size)]
 
     fitness_scores = [(individual, 0) for individual in population]

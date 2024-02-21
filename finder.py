@@ -139,14 +139,18 @@ def burn(glass):
             c += 1
     return c
 
-def place_height(glass):
+def height_dif(glass):
     f = False
+    top = 0
+    bot = 0
     for idx, row in enumerate(glass):
-        if 2 in row:
-            f = True
-        elif not f:
-            return len(glass) - (idx + 1)
-    return 0
+        if 1 in row:
+            top = len(glass) - idx
+            break
+    for idx, row in enumerate(glass):
+        if 0 in row:
+            bot = len(glass) - idx
+    return top - bot
 
 # Example usage
 if __name__ == "__main__":

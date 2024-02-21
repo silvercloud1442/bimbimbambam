@@ -59,6 +59,8 @@ def draw_block(surface, x, y, color):
 def new_piece():
     global pieces
     if len(pieces) == 0:
+        pieces_in = []
+        [pieces_in.extend(SHAPES) for _ in range(5)]
         pieces = deepcopy(pieces_in)
     shape = pieces.pop()
     piece = {
@@ -173,7 +175,7 @@ def get_best_pos(board, piece, n):
                (brn * burn(new_pos)) +
                (hg * calculate_height(new_pos)) +
                (ktl * count_kotls(new_pos)) +
-               (phg * place_height(new_pos))
+               (phg * height_dif(new_pos))
                 )
         try:
             figs[tax].append((position))
@@ -207,33 +209,30 @@ def al(n, idx):
     game_over = False
     c = 0
     while not game_over:
-        f = True
-        if f:
-            if piece['shape'] != rotate_pos:
-                rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
-                if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
-                    piece['shape'] = rotated_shape
-            else:
-                piece['x'] = col_num
-                f = False
-        # piece['shape'] = rotate_pos
-        # piece['x'] = col_num
+        # f = True
+        # if f:
+        #     if piece['shape'] != rotate_pos:
+        #         rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
+        #         if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
+        #             piece['shape'] = rotated_shape
+        #     else:
+        #         piece['x'] = col_num
+        #         f = False
+        piece['shape'] = rotate_pos
+        piece['x'] = col_num
+        piece['y'] = row_num
 
-
-        if is_valid_position(board, piece, adj_y=1):
-            piece['y'] += 1
-        else:
-            merge_piece(board, piece)
-            score += check_lines(board)
-            score_surface = font.render(str(score), True, (255, 255, 255))
-            piece, pieces = new_piece()
-            n_pieces += 1
-            row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
-            if not is_valid_position(board, piece):
-                game_over = True
-            if score >= 20000:
-                game_over = True
-                score += abs(45000 - n_pieces)
+        # if is_valid_position(board, piece, adj_y=1):
+        #     piece['y'] += 1
+        # else:
+        merge_piece(board, piece)
+        score += check_lines(board)
+        score_surface = font.render(str(score), True, (255, 255, 255))
+        piece, pieces = new_piece()
+        n_pieces += 1
+        row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
+        if not is_valid_position(board, piece):
+            game_over = True
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -306,6 +305,6 @@ def _evo_():
     print("Best score:", best_score)
 
 if __name__ == '__main__':
-    n = [9.228456141792355, -0.2660360825846304, 1.871245564656416, 6.2707419377539555, 4.056100876747962, 3.571063702812714]
-    # al(n, 0)
-    _evo_()
+    n = [22.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 10.056100876747962, 5.571063702812714]
+    al(n, 0)
+    # _evo_()

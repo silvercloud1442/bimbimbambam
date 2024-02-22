@@ -80,34 +80,6 @@ def count_empty_cells(glass):
     return empty_count
 
 def count_kotls(glass):
-    # kotls = 0
-    # l_c = 0
-    # m_c = 0
-    # r_c = 0
-    # for row in glass:
-    #     s_row = ''.join(map(str, row))
-    #     if s_row[:2] == '01' or s_row[:2] == '02':
-    #         l_c += 1
-    #         if l_c == 3:
-    #             l_c = 0
-    #             kotls += 1
-    #     else:
-    #         l_c = 0
-    #     if '101' in s_row or '202' in s_row:
-    #         m_c += 1
-    #         if m_c == 3:
-    #             m_c = 0
-    #             kotls += 1
-    #     else:
-    #         m_c = 0
-    #     if s_row[:2] == '10' or s_row[:2] == '20':
-    #         r_c += 1
-    #         if r_c == 3:
-    #             r_c = 0
-    #             kotls += 1
-    #     else:
-    #         r_c = 0
-    # return kotls
     count = 0
     for col in range(len(glass[0])):
         for row in range(len(glass) - 3):  # Ensure at least 4 rows left
@@ -151,34 +123,3 @@ def height_dif(glass):
         if 0 in row:
             bot = len(glass) - idx
     return top - bot
-
-# Example usage
-if __name__ == "__main__":
-
-    glass = [[0] * 10 for _ in range(20)]
-
-    tetris_figures = [[[1],
-                      [1],
-                      [1],
-                      [1]]]
-    # Iterate over all Tetris figures
-    figs = {}
-    for figure in tetris_figures:
-        possible_positions = generate_possible_positions(glass, figure)
-        print("Possible positions for figure:")
-        for position in possible_positions:
-            # print(position)
-            new_pos = return_final_position(deepcopy(glass), *position)
-            # pprint(new_pos)
-            tax = calculate_height(new_pos) + count_empty_cells(new_pos)
-            pprint(new_pos)
-            print(tax)
-    #         try:
-    #             figs[tax].append((position, new_pos))
-    #         except:
-    #             figs[tax] = []
-    #             figs[tax].append((position, new_pos))
-    # best_score = sorted(figs.keys())[0]
-    # pos = figs[best_score][0][1]
-    # pprint(pos)
-    # print(figs[best_score][0][0])

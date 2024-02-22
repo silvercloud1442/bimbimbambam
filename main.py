@@ -40,11 +40,6 @@ SHAPES = [
 pieces_in = []
 [pieces_in.extend(SHAPES) for _ in range(5)]
 pieces = deepcopy(pieces_in)
-#
-# # Initialize pygame
-# pygame.init()
-# screen = pygame.display.set_mode((WIDTH, HEIGHT))
-# pygame.display.set_caption("Tetris")
 
 # Functions
 def draw_grid(surface):
@@ -112,56 +107,6 @@ def check_lines(board):
         score += 1
         board.insert(0, [0] * GRID_WIDTH)
     return 2 ** score
-
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Tetris")
-
-    board = [[0] * GRID_WIDTH for _ in range(GRID_HEIGHT)]
-    piece = new_piece()
-    clock = pygame.time.Clock()
-    game_over = False
-    while not game_over:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    if is_valid_position(board, piece, adj_x=-1):
-                        piece['x'] -= 1
-                elif event.key == pygame.K_RIGHT:
-                    if is_valid_position(board, piece, adj_x=1):
-                        piece['x'] += 1
-                elif event.key == pygame.K_DOWN:
-                    if is_valid_position(board, piece, adj_y=1):
-                        piece['y'] += 1
-                elif event.key == pygame.K_UP:
-                    # Rotate piece
-                    rotated_shape = [list(reversed(row)) for row in zip(*piece['shape'])]
-                    if is_valid_position(board, {'shape': rotated_shape, 'x': piece['x'], 'y': piece['y']}):
-                        piece['shape'] = rotated_shape
-
-        if is_valid_position(board, piece, adj_y=1):
-            piece['y'] += 1
-        else:
-            merge_piece(board, piece)
-            check_lines(board)
-            piece = new_piece()
-            if not is_valid_position(board, piece):
-                game_over = True
-
-        screen.fill(BLACK)
-        draw_grid(screen)
-        draw_piece(screen, piece)
-        for y, row in enumerate(board):
-            for x, val in enumerate(row):
-                if val:
-                    draw_block(screen, x, y, COLORS[val - 1])
-        pygame.display.update()
-        clock.tick(15)
-
-    pygame.quit()
 
 def get_best_pos(board, piece, n):
     possible_positions = generate_possible_positions(board, piece)
@@ -233,6 +178,9 @@ def al(n, idx):
         row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
         if not is_valid_position(board, piece):
             game_over = True
+        if score >= 10000:
+            game_over = True
+            score += (10000 - n_pieces)
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -244,7 +192,7 @@ def al(n, idx):
         screen.blit(gen_surface, (0, 0))
         screen.blit(score_surface, (200, 0))
         pygame.display.update()
-        clock.tick(100000000)
+        # clock.tick(100000000)
     pygame.quit()
     return score
 
@@ -305,6 +253,7 @@ def _evo_():
     print("Best score:", best_score)
 
 if __name__ == '__main__':
-    n = [22.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 10.056100876747962, 5.571063702812714]
-    al(n, 0)
-    # _evo_()
+    n = [20.106702447403805, 0, 0.06371355904861287, 4.289405717461872, 8.144123517393595, 11.70938407291045]
+    # stable [22.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 10.056100876747962, 5.571063702812714]
+    # al(n, 0)
+    _evo_()

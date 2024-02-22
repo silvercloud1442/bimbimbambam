@@ -38,7 +38,7 @@ SHAPES = [
      [1, 0, 0]]
 ]
 pieces_in = []
-[pieces_in.extend(SHAPES) for _ in range(5)]
+[pieces_in.extend(SHAPES) for _ in range(10)]
 pieces = deepcopy(pieces_in)
 
 # Functions
@@ -55,7 +55,7 @@ def new_piece():
     global pieces
     if len(pieces) == 0:
         pieces_in = []
-        [pieces_in.extend(SHAPES) for _ in range(5)]
+        [pieces_in.extend(SHAPES) for _ in range(10)]
         pieces = deepcopy(pieces_in)
     shape = pieces.pop()
     piece = {
@@ -106,7 +106,7 @@ def check_lines(board):
         del board[line]
         score += 1
         board.insert(0, [0] * GRID_WIDTH)
-    return 2 ** score
+    return 3 ** score
 
 def get_best_pos(board, piece, n):
     possible_positions = generate_possible_positions(board, piece)
@@ -178,9 +178,10 @@ def al(n, idx):
         row_num, col_num, rotate_pos = get_best_pos(board, piece['shape'], n)
         if not is_valid_position(board, piece):
             game_over = True
-        if score >= 10000:
+        if score >= 20000:
             game_over = True
-            score += (10000 - n_pieces)
+            score += (20000 - n_pieces)
+
 
         screen.fill(BLACK)
         draw_grid(screen)
@@ -255,5 +256,5 @@ def _evo_():
 if __name__ == '__main__':
     n = [20.106702447403805, 0, 0.06371355904861287, 4.289405717461872, 8.144123517393595, 11.70938407291045]
     # stable [22.228456141792355, -0, 1.871245564656416, 6.2707419377539555, 10.056100876747962, 5.571063702812714]
-    # al(n, 0)
-    _evo_()
+    al(n, 0)
+    # _evo_()
